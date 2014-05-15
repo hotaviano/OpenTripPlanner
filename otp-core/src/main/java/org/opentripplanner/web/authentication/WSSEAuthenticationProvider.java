@@ -119,13 +119,9 @@ public class WSSEAuthenticationProvider implements AuthenticationProvider, Initi
 
 		sha1.reset();
 		byte[] digest = sha1.digest((nonce + created + password).getBytes());
-		System.out.println(nonce + " // " + created + " // " + password);
 		wsseAuthentication.setAuthorities(new ArrayList(userDetails.getAuthorities()));
-		System.out.println("roles: " + wsseAuthentication.getAuthorities());
 		
 		byte[] base64Digest = Base64.encode(digest);
-
-		System.out.println(base64Digest + " // " + authDetails.getPasswordDigest().getBytes() + " // " + Arrays.equals(base64Digest, authDetails.getPasswordDigest().getBytes()));
 
 		if (!Arrays.equals(base64Digest, authDetails.getPasswordDigest().getBytes())) {
 			throw new BadCredentialsException("bad digest");
