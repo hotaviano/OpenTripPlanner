@@ -18,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -25,7 +26,7 @@ import java.util.Queue;
 import java.util.TimeZone;
 
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.web.authentication.WSSEAuthentication.WSSEAuthDetails;
+import org.opentripplanner.web.authentication.WSSEAuthentication;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -80,7 +81,8 @@ public class WSSEAuthenticationProvider implements AuthenticationProvider, Initi
 		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 		String password = userDetails.getPassword();
 
-		WSSEAuthentication.WSSEAuthDetails authDetails = (WSSEAuthDetails) auth
+		WSSEAuthentication wsseAuthentication = (WSSEAuthentication) auth;
+		WSSEAuthentication.WSSEAuthDetails authDetails =  (WSSEAuthentication.WSSEAuthDetails) wsseAuthentication
 				.getDetails();
 
 		String nonce = authDetails.getNonce();
@@ -117,7 +119,14 @@ public class WSSEAuthenticationProvider implements AuthenticationProvider, Initi
 
 		sha1.reset();
 		byte[] digest = sha1.digest((nonce + created + password).getBytes());
+		System.out.println(nonce + " // " + created + " // " + password);
+		wsseAuthentication.setAuthorities(new ArrayList(userDetails.getAuthorities()));
+		System.out.println("roles: " + wsseAuthentication.getAuthorities());
+		
 		byte[] base64Digest = Base64.encode(digest);
+
+		System.out.println(base64Digest + " // " + authDetails.getPasswordDigest().getBytes() + " // " + Arrays.equals(base64Digest, authDetails.getPasswordDigest().getBytes()));
+
 		if (!Arrays.equals(base64Digest, authDetails.getPasswordDigest().getBytes())) {
 			throw new BadCredentialsException("bad digest");
 		}

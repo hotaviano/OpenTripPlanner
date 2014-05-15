@@ -26,27 +26,31 @@
 	-->
 
 	<security:http entry-point-ref="wsseAuthenticationEntryPoint">
-		<security:intercept-url pattern="/ws/patch*"
-			access="ROLE_USER" />
+		<security:intercept-url pattern="/ws/routers/*"
+			access="ROLE_ROUTERS" />
+
+		<security:intercept-url pattern="/ws/routers/metadata"  filters="none" />
 		<!--
 			security:intercept-url pattern="/ws/patch*"
 			access="ROLE_ANONYMOUS"></security:intercept-url
 		-->
 		<security:custom-filter position="BASIC_AUTH_FILTER"
 			ref="wsseAuthenticationFilter" />
+
 	</security:http>
+
+	
 
 	<bean id="wsseProvider"
 		class="org.opentripplanner.web.authentication.WSSEAuthenticationProvider">
 		<property name="userDetailsService">
-		<bean class="org.opentripplanner.web.authentication.SimpleUserDetailsService">
-		<property name="users">
-		<list>
-		<!-- To add a user, do this:
-		<value>admin=theadminpassword</value>
-		-->
-		</list>
-		</property>
+		<bean class="org.springframework.security.core.userdetails.memory.InMemoryDaoImpl">
+		<property name="userMap">
+            <value>
+                admin=123456,ROLE_ROUTERS,ROLE_USER
+            </value>
+        </property>
+
 		</bean>
 		</property>
 	</bean>
@@ -65,6 +69,8 @@
 
 	<security:authentication-manager alias="authenticationManager">
 		<security:authentication-provider ref="wsseProvider">
+			
 		</security:authentication-provider>
 	</security:authentication-manager>
+	
 </beans>

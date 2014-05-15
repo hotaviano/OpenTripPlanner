@@ -41,6 +41,7 @@ public class WSSEAuthentication implements Authentication {
 	private String nonce;
 	private String created;
 	private boolean authenticated;
+	private ArrayList<GrantedAuthority> authorities;
 
 	public WSSEAuthentication(String username, String passwordDigest, String nonce,
 			String created) {
@@ -52,9 +53,15 @@ public class WSSEAuthentication implements Authentication {
 
 	@Override
 	public Collection<GrantedAuthority> getAuthorities() {
-		ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new GrantedAuthorityImpl("user"));
+		if (authorities == null) {
+			return new ArrayList<GrantedAuthority>();
+		}
+
 		return authorities;
+	}
+
+	public void setAuthorities(ArrayList<GrantedAuthority> authorities) {
+		this.authorities = authorities;
 	}
 
 	@Override
